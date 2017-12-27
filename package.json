@@ -1,0 +1,27 @@
+{
+  "name": "mystudy-material-sync",
+  "version": "0.1.0",
+  "description": "Simple CLI tool for downloading the material folders of Leuphana MyStudy courses.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/app.js",
+    "build": "npm run build-ts && npm run tslint",
+    "build-ts": "tsc",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vituslehner/mystudy-material-sync.git"
+  },
+  "author": "Vitus Lehner",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vituslehner/mystudy-material-sync/issues"
+  },
+  "homepage": "https://github.com/vituslehner/mystudy-material-sync#readme",
+  "devDependencies": {
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.2"
+  }
+}
