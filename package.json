@@ -4,7 +4,7 @@
   "description": "Simple CLI tool for downloading the material folders of Leuphana MyStudy courses.",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/app.js",
+    "start": "npm run build-ts && node dist/app.js",
     "build": "npm run build-ts && npm run tslint",
     "build-ts": "tsc",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
@@ -21,7 +21,25 @@
   },
   "homepage": "https://github.com/vituslehner/mystudy-material-sync#readme",
   "devDependencies": {
+    "@types/cheerio": "^0.22.7",
+    "@types/he": "^0.5.29",
+    "@types/qs": "^6.5.1",
+    "@types/sanitize-filename": "^1.1.28",
     "tslint": "^5.8.0",
     "typescript": "^2.6.2"
-  }
+  },
+  "dependencies": {
+    "@3846masa/axios-cookiejar-support": "^0.3.2",
+    "axios": "^0.17.1",
+    "cheerio": "^1.0.0-rc.2",
+    "he": "^1.1.1",
+    "inquirer": "^4.0.1",
+    "qs": "^6.5.1",
+    "sanitize-filename": "^1.6.1",
+    "tough-cookie": "^2.3.3"
+  },
+  "pkg": {
+    "scripts": "dist/**/*.js"
+  },
+  "bin": "dist/app.js"
 }
