@@ -22,6 +22,7 @@
   "homepage": "https://github.com/vituslehner/mystudy-material-sync#readme",
   "devDependencies": {
     "@types/cheerio": "^0.22.7",
+    "@types/dotenv": "^4.0.3",
     "@types/he": "^0.5.29",
     "@types/qs": "^6.5.1",
     "@types/sanitize-filename": "^1.1.28",
@@ -32,6 +33,7 @@
     "@3846masa/axios-cookiejar-support": "^0.3.2",
     "axios": "^0.17.1",
     "cheerio": "^1.0.0-rc.2",
+    "dotenv": "^6.0.0",
     "he": "^1.1.1",
     "inquirer": "^4.0.1",
     "qs": "^6.5.1",

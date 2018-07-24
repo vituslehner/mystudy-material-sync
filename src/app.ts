@@ -4,6 +4,8 @@
 // the project root for full license information.
 //
 
+import { config } from "dotenv";
+
 import { myStudyClient } from "./client";
 import * as cheerio from "cheerio";
 import { AxiosResponse } from "axios";
@@ -23,7 +25,10 @@ class App {
 
         const homepageResponse: AxiosResponse = await myStudyClient.getHomepage();
 
-        const loginResponse: AxiosResponse = await myStudyClient.postLogin("", "");
+        const loginResponse: AxiosResponse = await myStudyClient.postLogin(
+            process.env.MYSTUDY_USERNAME,
+            process.env.MYSTUDY_PASSWORD
+        );
         App.checkLoginSuccess(loginResponse);
         console.info("\n-- Login successful!");
 
@@ -162,6 +167,8 @@ class App {
 }
 
 try {
+    config();
+
     const app: App = new App();
     app.run();
 } catch (e) {
