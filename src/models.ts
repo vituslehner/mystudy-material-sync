@@ -4,13 +4,13 @@
 // the project root for full license information.
 //
 
-export class Enrollment {
+export interface Enrollment {
     name: string;
     id: string;
     veranstaltung_id: string;
 }
 
-export class Item {
+export interface Item {
     id: string;
     type: string;
     name: string;
@@ -27,7 +27,7 @@ export const ITEM_TYPE = {
     lecture: "lecture"
 };
 
-export class DownloadJob {
+export interface DownloadJob {
     item: Item;
     downloadFilePath: string;
     relativeDownloadFilePath: string;
