@@ -16,7 +16,7 @@ export function jsonToItem(json: any): Item {
     return {
         id: json.metadata.id,
         name: name,
-        sanitizedName: sanitize(name),
+        sanitizedName: sanitizeFileSystemName(name),
         type: json.type,
         isProtected: json.metadata.protectsDescendants !== "0",
         hasSubdirectories: json.metadata.hasSubdirectories === "1",
@@ -29,6 +29,10 @@ export function jsonToItem(json: any): Item {
               })(json)
             : []
     };
+}
+
+export function sanitizeFileSystemName(name: string) {
+    return sanitize(name);
 }
 
 export function printItemRecursively(item: Item, depth: number = 0): void {

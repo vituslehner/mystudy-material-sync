@@ -10,7 +10,7 @@ import { myStudyClient } from "./client";
 import * as cheerio from "cheerio";
 import { AxiosResponse } from "axios";
 import { DownloadJob, Enrollment, Item, ITEM_TYPE } from "./models";
-import { jsonToItem, itemPathToString } from "./utils";
+import { jsonToItem, itemPathToString, sanitizeFileSystemName } from "./utils";
 import * as os from "os";
 import { constants } from "./constants";
 import * as fs from "fs";
@@ -36,7 +36,7 @@ class App {
         const dashboardDom: CheerioStatic = cheerio.load(dashboardResponse.data);
 
         const semester = App.extractSemesterFromDashboard(dashboardDom);
-        const semesterBasePath = downloadBasePath + "/" + semester;
+        const semesterBasePath = downloadBasePath + "/" + sanitizeFileSystemName(semester);
         console.info("-- Semester:", semester);
         console.info("-- Semester directory:", semesterBasePath);
 
@@ -58,12 +58,7 @@ class App {
             })
         );
 
-        if (!fs.existsSync(downloadBasePath)) {
-            fs.mkdirSync(downloadBasePath);
-        }
-        if (!fs.existsSync(semesterBasePath)) {
-            fs.mkdirSync(semesterBasePath);
-        }
+        App.ensureLocalDirectories(downloadBasePath, semesterBasePath);
 
         const jobs = items
             .map(i => App.syncItemRecursively(i, [], semesterBasePath))
@@ -154,6 +149,15 @@ class App {
             .reduce((previousJobs, currentJobs) => {
                 return previousJobs.concat(currentJobs);
             }, jobs);
+    }
+
+    private static ensureLocalDirectories(downloadBasePath: string, semesterBasePath: string) {
+        if (!fs.existsSync(downloadBasePath)) {
+            fs.mkdirSync(downloadBasePath);
+        }
+        if (!fs.existsSync(semesterBasePath)) {
+            fs.mkdirSync(semesterBasePath);
+        }
     }
 
     private static async processDownloadJobs(jobs: DownloadJob[]) {
