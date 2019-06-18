@@ -7,7 +7,7 @@
 import axios, { AxiosPromise, AxiosRequestConfig } from "axios";
 import { constants } from "./constants";
 import * as qs from "qs";
-import axiosCookieJarSupport from "@3846masa/axios-cookiejar-support";
+import axiosCookieJarSupport from "axios-cookiejar-support";
 import tough = require("tough-cookie");
 
 class MyStudyClient {
