@@ -129,16 +129,16 @@ class App {
         const jobs = [];
 
         if (fs.existsSync(itemPath)) {
-            console.debug("-- Already exists:", itemPath);
+            // console.debug("-- Already exists:", itemPath);
         } else {
-            console.info("-- New:", itemPath);
+            // console.info("-- New:", itemPath);
 
             if (item.type === ITEM_TYPE.lecture && item.children.length === 0) {
                 console.debug("-- Skipping because lecture empty:", item.name);
             } else if (item.type === ITEM_TYPE.lecture || item.type === ITEM_TYPE.directory) {
                 console.info("-- Creating directory for", item.name);
                 fs.mkdirSync(itemPath);
-                console.info("-- Finished creating directory for", item.name);
+                // console.info("-- Finished creating directory for", item.name);
             } else if (item.type === ITEM_TYPE.file) {
                 jobs.push({ item: item, downloadFilePath: itemPath } as DownloadJob);
             }
