@@ -89,7 +89,7 @@ class App {
         if (enrollmentsData.liste && enrollmentsData.liste.length > 0) {
             return enrollmentsData.liste as Enrollment[];
         }
-        throw new Error("Can not read enrollments: Invalid format");
+        throw new Error("Can not read enrollments: Empty list or invalid format (Are you actually enrolled somewhere for this semester?)");
     }
 
     private static validateAndExtractLectureItem(fileManagerDom: CheerioStatic) {
