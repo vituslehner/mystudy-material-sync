@@ -127,15 +127,17 @@ class App {
     private static syncItemRecursively(item: Item, path: Item[], basePath: string): DownloadJob[] {
         const itemPath = basePath + itemPathToString(path) + "/" + item.sanitizedName;
         const jobs = [];
+        const fileExists = fs.existsSync(itemPath);
 
-        if (fs.existsSync(itemPath)) {
+        if (fileExists && item.timestamp.getTime() == fs.statSync(itemPath).mtime.getTime()) {
             // console.debug("-- Already exists:", itemPath);
+            // console.debug("---- item timestamp:", item.timestamp);
+            // console.debug("---- file timestamp modified:", fs.statSync(itemPath).mtime);
+            // console.debug("---- file timestamp created:", fs.statSync(itemPath).ctime);
         } else {
-            // console.info("-- New:", itemPath);
-
             if (item.type === ITEM_TYPE.lecture && item.children.length === 0) {
                 console.debug("-- Skipping because lecture empty:", item.name);
-            } else if (item.type === ITEM_TYPE.lecture || item.type === ITEM_TYPE.directory) {
+            } else if (!fileExists && (item.type === ITEM_TYPE.lecture || item.type === ITEM_TYPE.directory)) {
                 console.info("-- Creating directory for", item.name);
                 fs.mkdirSync(itemPath);
                 // console.info("-- Finished creating directory for", item.name);
@@ -164,7 +166,12 @@ class App {
         for (const job of jobs) {
             console.info("-- Downloading", `"${job.item.name}"`);
             const downloadResponse: AxiosResponse = await myStudyClient.getDownload(job.item.id);
-            downloadResponse.data.pipe(fs.createWriteStream(job.downloadFilePath));
+            const fd = fs.openSync(job.downloadFilePath, "w");
+            const stream = fs.createWriteStream(undefined, {fd: fd});
+            downloadResponse.data.pipe(stream);
+            stream.on("close", () => {
+                fs.utimesSync(job.downloadFilePath, job.item.timestamp, job.item.timestamp);
+            });
             console.info("   Finished");
         }
     }
