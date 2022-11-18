@@ -15,6 +15,7 @@ import * as os from "os";
 import { constants } from "./constants";
 import * as fs from "fs";
 
+
 class App {
     async run() {
         const userDirectory = os.homedir();
@@ -106,7 +107,7 @@ class App {
     }
 
     private static async loadFileTreeRecursively(item: Item): Promise<Item> {
-        if (item.type === ITEM_TYPE.file || item.isProtected) {
+        if (item.type === ITEM_TYPE.file || (item.isProtected && !item.accessGranted)) {
             return Promise.resolve(item);
         }
 
