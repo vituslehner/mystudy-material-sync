@@ -19,9 +19,12 @@ import * as fs from "fs";
 class App {
     async run() {
         const userDirectory = os.homedir();
-        const downloadBasePath = userDirectory + "/" + constants.local.downloadDirectory;
-
         console.debug("-- User directory:", os.homedir());
+
+        let downloadBasePath = process.env.MYSTUDY_DOWNLOAD_DIRECTORY || constants.local.downloadDirectory;
+        if (downloadBasePath.startsWith("~/")) {
+            downloadBasePath = userDirectory + "/" + downloadBasePath.slice(2);
+        }
         console.debug("-- Download directory:", downloadBasePath);
 
         const homepageResponse: AxiosResponse = await myStudyClient.getHomepage();

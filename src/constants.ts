@@ -19,6 +19,6 @@ export const constants: any = {
         }
     },
     local: {
-        downloadDirectory: "MyStudy-Material"
+        downloadDirectory: "~/MyStudy-Material"
     }
 };
