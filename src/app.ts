@@ -168,7 +168,7 @@ class App {
 
     private static async processDownloadJobs(jobs: DownloadJob[]) {
         for (const job of jobs) {
-            console.info("-- Downloading", `"${job.item.name}"`);
+            console.info("-- Downloading", `"${job.downloadFilePath}"`);
             const downloadResponse: AxiosResponse = await myStudyClient.getDownload(job.item.id);
             const fd = fs.openSync(job.downloadFilePath, "w");
             const stream = fs.createWriteStream(undefined, {fd: fd});
