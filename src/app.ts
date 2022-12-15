@@ -132,8 +132,19 @@ class App {
         const itemPath = basePath + itemPathToString(path) + "/" + item.sanitizedName;
         const jobs = [];
         const fileExists = fs.existsSync(itemPath);
+        const timeModifiedIdentical = fileExists && item.timestamp.getTime() == fs.statSync(itemPath).mtime.getTime();
 
-        if (fileExists && item.timestamp.getTime() == fs.statSync(itemPath).mtime.getTime()) {
+        if (fileExists && !timeModifiedIdentical && (item.type !== ITEM_TYPE.lecture) && (item.type !== ITEM_TYPE.directory)) {
+            const new_basedir = basePath + "/modified";
+            if (!fs.existsSync(new_basedir)) {
+                fs.mkdirSync(new_basedir);
+            }
+            console.log("The file \"" + itemPath + "\" already exists bit the modification times differ.",
+                        "We will therefore download it into \"" + new_basedir + "\"");
+            return App.syncItemRecursively(item, [], new_basedir);
+        }
+
+        if (fileExists) {
             // console.debug("-- Already exists:", itemPath);
             // console.debug("---- item timestamp:", item.timestamp);
             // console.debug("---- file timestamp modified:", fs.statSync(itemPath).mtime);
