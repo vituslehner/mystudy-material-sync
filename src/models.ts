@@ -19,6 +19,7 @@ export interface Item {
     hasSubdirectories: boolean;
     accessGranted: boolean;
     children: Item[];
+    timestamp: Date;
 }
 
 export const ITEM_TYPE = {

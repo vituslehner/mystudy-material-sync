@@ -15,12 +15,16 @@ import * as os from "os";
 import { constants } from "./constants";
 import * as fs from "fs";
 
+
 class App {
     async run() {
         const userDirectory = os.homedir();
-        const downloadBasePath = userDirectory + "/" + constants.local.downloadDirectory;
-
         console.debug("-- User directory:", os.homedir());
+
+        let downloadBasePath = process.env.MYSTUDY_DOWNLOAD_DIRECTORY || constants.local.downloadDirectory;
+        if (downloadBasePath.startsWith("~/")) {
+            downloadBasePath = userDirectory + "/" + downloadBasePath.slice(2);
+        }
         console.debug("-- Download directory:", downloadBasePath);
 
         const homepageResponse: AxiosResponse = await myStudyClient.getHomepage();
@@ -106,7 +110,7 @@ class App {
     }
 
     private static async loadFileTreeRecursively(item: Item): Promise<Item> {
-        if (item.type === ITEM_TYPE.file || item.isProtected) {
+        if (item.type === ITEM_TYPE.file || (item.isProtected && !item.accessGranted)) {
             return Promise.resolve(item);
         }
 
@@ -127,15 +131,28 @@ class App {
     private static syncItemRecursively(item: Item, path: Item[], basePath: string): DownloadJob[] {
         const itemPath = basePath + itemPathToString(path) + "/" + item.sanitizedName;
         const jobs = [];
+        const fileExists = fs.existsSync(itemPath);
+        const timeModifiedIdentical = fileExists && item.timestamp.getTime() == fs.statSync(itemPath).mtime.getTime();
 
-        if (fs.existsSync(itemPath)) {
+        if (fileExists && !timeModifiedIdentical && (item.type !== ITEM_TYPE.lecture) && (item.type !== ITEM_TYPE.directory)) {
+            const new_basedir = basePath + "/modified";
+            if (!fs.existsSync(new_basedir)) {
+                fs.mkdirSync(new_basedir);
+            }
+            console.log("The file \"" + itemPath + "\" already exists bit the modification times differ.",
+                        "We will therefore download it into \"" + new_basedir + "\"");
+            return App.syncItemRecursively(item, [], new_basedir);
+        }
+
+        if (fileExists) {
             // console.debug("-- Already exists:", itemPath);
+            // console.debug("---- item timestamp:", item.timestamp);
+            // console.debug("---- file timestamp modified:", fs.statSync(itemPath).mtime);
+            // console.debug("---- file timestamp created:", fs.statSync(itemPath).ctime);
         } else {
-            // console.info("-- New:", itemPath);
-
             if (item.type === ITEM_TYPE.lecture && item.children.length === 0) {
                 console.debug("-- Skipping because lecture empty:", item.name);
-            } else if (item.type === ITEM_TYPE.lecture || item.type === ITEM_TYPE.directory) {
+            } else if (!fileExists && (item.type === ITEM_TYPE.lecture || item.type === ITEM_TYPE.directory)) {
                 console.info("-- Creating directory for", item.name);
                 fs.mkdirSync(itemPath);
                 // console.info("-- Finished creating directory for", item.name);
@@ -162,9 +179,14 @@ class App {
 
     private static async processDownloadJobs(jobs: DownloadJob[]) {
         for (const job of jobs) {
-            console.info("-- Downloading", `"${job.item.name}"`);
+            console.info("-- Downloading", `"${job.downloadFilePath}"`);
             const downloadResponse: AxiosResponse = await myStudyClient.getDownload(job.item.id);
-            downloadResponse.data.pipe(fs.createWriteStream(job.downloadFilePath));
+            const fd = fs.openSync(job.downloadFilePath, "w");
+            const stream = fs.createWriteStream(undefined, {fd: fd});
+            downloadResponse.data.pipe(stream);
+            stream.on("close", () => {
+                fs.utimesSync(job.downloadFilePath, job.item.timestamp, job.item.timestamp);
+            });
             console.info("   Finished");
         }
     }

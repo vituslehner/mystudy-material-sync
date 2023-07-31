@@ -21,6 +21,7 @@ export function jsonToItem(json: any): Item {
         isProtected: json.metadata.protectsDescendants !== "0",
         hasSubdirectories: json.metadata.hasSubdirectories === "1",
         accessGranted: json.metadata.userHasAccess === "1",
+        timestamp: new Date(1000 * Number.parseInt(json.metadata.timestamp)),
         children: json.content
             ? (function(json: any) {
                   const subdirectories = json.content.subdirectories.map(jsonToItem);
